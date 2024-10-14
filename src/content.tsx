@@ -2,6 +2,25 @@ import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import cn from "classnames";
+import DOMPurify from "dompurify";
+import { Marked } from "marked";
+import { markedHighlight } from "marked-highlight";
+import hljs from "highlight.js";
+import "highlight.js/styles/github-dark.min.css";
+
+const marked = new Marked(
+  {
+    gfm: true,
+    breaks: true,
+  },
+  markedHighlight({
+    langPrefix: "hljs language-",
+    highlight(code: string, lang: string) {
+      const language: string = hljs.getLanguage(lang) ? lang : "plaintext";
+      return hljs.highlight(code, { language }).value;
+    },
+  })
+);
 
 const getRoot = () => {
   const root = document.createElement("div");
@@ -19,21 +38,22 @@ const isTextAreaElement = (
 const App = () => {
   const injectedRef = useRef<HTMLDivElement>(null);
   const [isFocused, setIsFocused] = useState<boolean>(false);
-
   const [textAreaContent, setTextAreaContent] = useState<string>("");
+  console.log(textAreaContent);
 
   useEffect(() => {
     if (!isFocused) return;
 
     const focusedTextarea = document.activeElement;
-    console.log(focusedTextarea);
 
     if (!isTextAreaElement(focusedTextarea)) return;
 
-    const handleInput = (e: Event) => {
+    const handleInput = async (e: Event) => {
       if (!isTextAreaElement(e.target)) return;
       console.log("abc");
       setTextAreaContent(e.target.value);
+      const md = await marked.parse(e.target.value);
+      setTextAreaContent(DOMPurify.sanitize(md));
     };
 
     focusedTextarea.addEventListener("input", handleInput);
@@ -43,11 +63,12 @@ const App = () => {
   }, [isFocused]);
 
   useEffect(() => {
-    const handleFocus = (e: Event) => {
+    const handleFocus = async (e: Event) => {
       if (!isTextAreaElement(e.target)) return;
 
       const focusedTextarea = e.target;
-      setTextAreaContent(focusedTextarea.value);
+      const md = await marked.parse(focusedTextarea.value);
+      setTextAreaContent(DOMPurify.sanitize(md));
 
       const fileAttachments = document.querySelectorAll("file-attachment");
 
@@ -55,6 +76,9 @@ const App = () => {
 
       for (let i = 0; i < fileAttachments.length; i++) {
         const fa = fileAttachments[i];
+
+        if (fa === undefined) return;
+
         const searchedTextAreas = fa.querySelectorAll("textarea");
 
         // focusedTextareaと同じtextareaがあれば、そのtextareaの親要素を取得
@@ -94,21 +118,33 @@ const App = () => {
   }, []);
 
   return (
-    <div
-      ref={injectedRef}
-      className={cn(
-        "side-preview",
-        "bg-slate-950 absolute top-0 p-2 rounded-sm whitespace-pre-line text-white w-[400px] opacity-0 transition-all duration-300",
-        isFocused && "opacity-100"
-      )}
-    >
-      <div>{textAreaContent}</div>
+    <div>
+      <div
+        ref={injectedRef}
+        className={cn(
+          "side-preview",
+          "z-50 absolute bg-slate-950 top-0 p-4 rounded-sm text-white w-[400px] opacity-0 transition-all duration-300 ",
+          isFocused && "opacity-80 backdrop-blur-sm "
+        )}
+      >
+        {textAreaContent !== "" ? (
+          <div
+            className="markdown-body"
+            dangerouslySetInnerHTML={{
+              __html: textAreaContent,
+            }}
+          />
+        ) : (
+          <div className="text-gray-300">Nothing to preview</div>
+        )}
+      </div>
     </div>
   );
 };
 
 ReactDOM.createRoot(getRoot()).render(
   <React.StrictMode>
+    <link rel="stylesheet" href="github-markdown.css"></link>
     <App />
   </React.StrictMode>
 );
