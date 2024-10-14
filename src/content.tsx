@@ -39,7 +39,6 @@ const App = () => {
   const injectedRef = useRef<HTMLDivElement>(null);
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [textAreaContent, setTextAreaContent] = useState<string>("");
-  console.log(textAreaContent);
 
   useEffect(() => {
     if (!isFocused) return;
@@ -50,7 +49,6 @@ const App = () => {
 
     const handleInput = async (e: Event) => {
       if (!isTextAreaElement(e.target)) return;
-      console.log("abc");
       setTextAreaContent(e.target.value);
       const md = await marked.parse(e.target.value);
       setTextAreaContent(DOMPurify.sanitize(md));
