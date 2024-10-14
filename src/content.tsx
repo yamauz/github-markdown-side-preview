@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
+import cn from "classnames";
 
 const getRoot = () => {
   const root = document.createElement("div");
@@ -93,8 +94,15 @@ const App = () => {
   }, []);
 
   return (
-    <div ref={injectedRef} className="side-preview">
-      {isFocused && textAreaContent !== "" && <div>{textAreaContent}</div>}
+    <div
+      ref={injectedRef}
+      className={cn(
+        "side-preview",
+        "bg-slate-950 absolute top-0 p-2 rounded-sm whitespace-pre-line text-white w-[400px] opacity-0 transition-all duration-300",
+        isFocused && "opacity-100"
+      )}
+    >
+      <div>{textAreaContent}</div>
     </div>
   );
 };

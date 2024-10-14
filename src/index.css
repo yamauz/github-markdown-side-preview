@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -31,11 +35,20 @@ code {
   padding: 1px 6px;
 }
 
-.side-preview {
-  width: 200px;
-  background-color: gray;
+/* .side-preview {
+  transition-behavior: allow-discrete;
+  transition: opacity 2s, display 2s;
+} */
+
+/* .side-preview {
+  transition: opacity 0.5s, display 0.5s allow-discrete !important;
+  background-color: tomato !important;
+  display: none;
+} */
+
+/* .side-preview:focus {
   position: absolute;
-  top: 0;
-  color: white !important;
-  white-space: pre-line;
-}
+  background-color: tomato !important;
+  display: block;
+  opacity: 1;
+} */
