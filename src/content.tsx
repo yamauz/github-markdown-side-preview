@@ -19,11 +19,34 @@ const App = () => {
   const injectedRef = useRef<HTMLDivElement>(null);
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
+  const [textAreaContent, setTextAreaContent] = useState<string>("");
+
+  useEffect(() => {
+    if (!isFocused) return;
+
+    const focusedTextarea = document.activeElement;
+    console.log(focusedTextarea);
+
+    if (!isTextAreaElement(focusedTextarea)) return;
+
+    const handleInput = (e: Event) => {
+      if (!isTextAreaElement(e.target)) return;
+      console.log("abc");
+      setTextAreaContent(e.target.value);
+    };
+
+    focusedTextarea.addEventListener("input", handleInput);
+    return () => {
+      focusedTextarea.removeEventListener("input", handleInput);
+    };
+  }, [isFocused]);
+
   useEffect(() => {
     const handleFocus = (e: Event) => {
       if (!isTextAreaElement(e.target)) return;
 
       const focusedTextarea = e.target;
+      setTextAreaContent(focusedTextarea.value);
 
       const fileAttachments = document.querySelectorAll("file-attachment");
 
@@ -39,8 +62,7 @@ const App = () => {
         );
 
         if (target !== undefined) {
-          console.log("Found target");
-          targetFileAttachment = fa;
+          targetFileAttachment = target;
           break;
         }
       }
@@ -52,14 +74,13 @@ const App = () => {
         const width = targetFileAttachment.getBoundingClientRect().width;
 
         // leftにwidthを足す
-        injectedRef.current.style.left = `${width + 30}px`;
+        injectedRef.current.style.left = `${width + 40}px`;
         targetFileAttachment.after(injectedRef.current);
         setIsFocused(true);
       }
     };
 
     const handleBlur = () => {
-      console.log("handleBlur");
       setIsFocused(false);
     };
 
@@ -71,11 +92,9 @@ const App = () => {
     };
   }, []);
 
-  console.log(isFocused);
-
   return (
     <div ref={injectedRef} className="side-preview">
-      {isFocused && <div>hello asdf asdf asfd asdf asdf</div>}
+      {isFocused && textAreaContent !== "" && <div>{textAreaContent}</div>}
     </div>
   );
 };
