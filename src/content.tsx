@@ -97,7 +97,7 @@ const App = () => {
         const width = targetFileAttachment.getBoundingClientRect().width;
 
         // leftにwidthを足す
-        injectedRef.current.style.left = `${width + 40}px`;
+        injectedRef.current.style.left = `${width + 20}px`;
         targetFileAttachment.after(injectedRef.current);
         setIsFocused(true);
       }
@@ -122,7 +122,7 @@ const App = () => {
         className={cn(
           "side-preview",
           "z-50 absolute bg-slate-950 top-0 p-4 rounded-sm text-white w-[400px] opacity-0 transition-all duration-300 ",
-          isFocused && "opacity-80 backdrop-blur-sm "
+          isFocused && "opacity-100 backdrop-blur-sm "
         )}
       >
         {textAreaContent !== "" ? (
